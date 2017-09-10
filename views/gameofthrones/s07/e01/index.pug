@@ -1,0 +1,17 @@
+doctype html
+html(lang="en")
+	head
+		title Stream
+		link(rel='stylesheet' href='/css/watchVideo.css')
+	body(background='/gameofthrones/GoTbg.jpg')
+		include /partials/header
+		div#bigContainer
+			include /partials/left-bar
+			div#videoContainer
+				include /partials/select-bar-GoTS07
+				div.videoNavi
+					a(href="../e02" class="videoNavi--next")
+						i(class="fa fa-arrow-right fa-2x" aria-hidden="true")
+				video#videoPlayer
+					source(src="GoTS07E01.mkv")
+		include /partials/videoControl

@@ -1,0 +1,46 @@
+doctype html
+html(lang="en")
+head
+	title Stream
+	link(rel='stylesheet' href='/css/index.css')
+body
+	include /partials/header
+	div#bigStreamContainer
+		include /partials/left-bar
+		div#streamContainer
+			p#timeTilSeason 
+			p#liveStreamStatus Livestream is #[em offline]
+			object#streamPlayer
+				param(name="movie" value="http://138.68.235.157/StrobeMedia/for%20Flash%20Player%2010.1/StrobeMediaPlayback.swf")
+				param(name="flashvars" value="src=rtmp%3A%2F%2F138.68.235.157%2Flive%2Fdubnation&optimizeBuffering=false&initialBufferTime=0&autoPlay=true")
+				param(name="allowFullScreen" value="true")
+				param(name="allowscriptaccess" value="always")
+				param(name="wmode" value="direct")
+				embed(src="http://138.68.235.157/StrobeMedia/for%20Flash%20Player%2010.1/StrobeMediaPlayback.swf" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" wmode="direct" flashvars="src=rtmp%3A%2F%2F138.68.235.157%2Flive%2Fdubnation&optimizeBuffering=false&initialBufferTime=0&autoPlay=true")
+		div#chat
+			script(id="cid0020000165930761874" data-cfasync="false" async src="//st.chatango.com/js/gz/emb.js" style="width: 100%;height: 100%;") {"handle":"dubstreams","arch":"js","styles":{"a":"006BB6","b":100,"c":"FFFFFF","d":"FFFFFF","k":"006BB6","l":"006BB6","m":"006BB6","n":"FFFFFF","p":"10","q":"006BB6","r":100,"t":0,"fwtickm":1, "showhdr":0,"showx":0}}
+	script.
+		$(document).ready(function(){
+			var end = new Date('10/17/2017');
+			var _hour = 1000 * 60 * 60;
+			var _day = _hour * 24;
+
+			function showRemaining() {
+				var now = new Date();
+					var distance = end - now;
+					if (distance < 0) {
+						document.getElementById('timeTilSeason').innerHTML = null;
+						return;
+					}
+					var days = Math.floor(distance / _day);
+		
+				document.getElementById('timeTilSeason').innerHTML = "NBA Season starts in " + days + " days";
+			}
+			showRemaining();
+			//- timer = setInterval(showRemaining, 1000);
+			function streamOnline() {
+				$("#liveStreamStatus").html("Livestream is <em>online</em>");
+				$("em").css("color", "green");
+				$("em").css("font-style", "normal");
+			}
+		});

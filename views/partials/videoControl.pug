@@ -1,0 +1,116 @@
+script(src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.1.min.js")
+script.
+	$(document).ready(function(){
+		var videoPlayer = document.getElementById("videoPlayer");
+		videoPlayer.removeAttribute("controls");
+		videoPlayer.ondblclick = function() {
+			if (isFullScreen() == false) {
+				fullScreen();
+			} else {
+				exitFullScreen();
+			}
+		}
+		videoPlayer.onclick = function() {
+			playVideo();
+		}
+		$(document).keypress(function(event){
+			if (event.key == ' ') {
+				playVideo();
+			}
+		});
+		$(document).keydown(function(event) {
+			if ($(document.body).height() >= $("#videoPlayer").height() ||
+				isFullScreen()) {
+				if (event.keyCode == 38) {
+					if (videoPlayer.volume + 0.05 <= 1) {
+						videoPlayer.volume += 0.05;	
+					}
+				}
+				if (event.keyCode == 40) {
+					if (videoPlayer.volume - 0.05 >= 0) {
+						videoPlayer.volume -= 0.05;
+					}
+				}				
+			}
+			if ($(document.body).width() >= $(document).width()) {
+				if (event.keyCode == 39) {
+					videoPlayer.currentTime += 3
+				}
+				if (event.keyCode == 37) {
+					videoPlayer.currentTime -= 3				
+				}
+			}
+		});
+		$("#videoPlayer").on({
+			mouseenter: function () {
+			  videoPlayer.setAttribute("controls", "controls")
+			},
+			mouseleave: function () {
+			  videoPlayer.removeAttribute("controls");
+			}
+		});
+		function playVideo() {
+			if (videoPlayer.paused) {
+				videoPlayer.play();
+			} else {
+				videoPlayer.pause();
+			}
+		}
+		function isFullScreen() {
+			if (document.fullScreen || 
+				document.mozFullScreen || 
+				document.webkitIsFullScreen) {
+				return true;
+				} else {
+				return false;
+				}		
+		}
+		function fullScreen() {
+			if (videoPlayer.requestFullscreen) {
+			  videoPlayer.requestFullscreen();
+			} else if (videoPlayer.mozRequestFullScreen) {
+			  videoPlayer.mozRequestFullScreen();
+			} else if (videoPlayer.webkitRequestFullscreen) {
+			  videoPlayer.webkitRequestFullscreen();
+			}		
+		}
+		function exitFullScreen() {
+			if (document.exitFullscreen) {
+				document.exitFullscreen();
+			} else if (document.webkitExitFullscreen) {
+				document.webkitExitFullscreen();
+			} else if (document.mozCancelFullScreen) {
+				document.mozCancelFullScreen();
+			} else if (document.msExitFullscreen) {
+				document.msExitFullscreen();
+			}
+		};
+		window.setTimeout(function() {
+			document.body.scrollTop = document.body.scrollHeight;
+			}, 500);
+		$("#select-bar").on("change", function() {
+			window.location = $(this).val();
+		});
+
+		var id = document.location.pathname;
+		var color;
+		var bg;
+
+		if (id.indexOf("rickandmorty") > 0) {
+			color = '#f0e14a';
+			bg = '#97ce4c';
+		} else if (id.indexOf("gameofthrones") > 0) {
+			color = '#505153';
+			bg = '#8b8b8b';
+		}
+			else {
+			color = '#FFC72D';
+			bg = '#006BB6'
+		}
+		$('#select-bar').css('background-color', bg);
+		$('#select-bar').css('color', color);
+		$('#select-bar option[value="' + window.location.pathname + '"]').prop('selected', true);
+		$('#select-bar option[value="' + window.location.pathname + '"]').css('color', color);
+		//- FFC72D
+		//- $("#select-bar").val(window.location.pathname);
+	});

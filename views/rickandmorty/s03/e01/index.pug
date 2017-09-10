@@ -1,0 +1,17 @@
+doctype html
+html(lang="en")
+	head
+		title Stream
+		link(rel='stylesheet' href='/css/watchVideo.css')
+	body(background='/rickandmorty/RnMbg.jpg')
+		include /partials/header
+		div#bigContainer
+			include /partials/left-bar
+			div#videoContainer
+				include /partials/select-bar-RnMS03
+				div.videoNavi
+					a(href="../e02" class="videoNavi--next")
+						i(class="fa fa-arrow-right fa-2x" aria-hidden="true")
+				video#videoPlayer
+					source(src="RnMS03E01.mkv")
+		include /partials/videoControl

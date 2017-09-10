@@ -1,0 +1,83 @@
+div#left-bar
+  button(id="show" onclick="slideDown(this);") Game of Thrones
+  div(id="seasons")
+    a.season(id="/gameofthrones/s01/" href="/gameofthrones/s01/e01") Season 1
+    a.season(id="/gameofthrones/s02/" href="/gameofthrones/s02/e01") Season 2
+    a.season(id="/gameofthrones/s03/" href="/gameofthrones/s03/e01") Season 3
+    a.season(id="/gameofthrones/s04/" href="/gameofthrones/s04/e01") Season 4
+    a.season(id="/gameofthrones/s05/" href="/gameofthrones/s05/e01") Season 5
+    a.season(id="/gameofthrones/s06/" href="/gameofthrones/s06/e01") Season 6
+    a.season(id="/gameofthrones/s07/" href="/gameofthrones/s07/e01") Season 7
+  div
+  button(id="show" onclick="slideDown(this);") Rick and Morty
+  div(id="seasons")
+    a.season(id="/rickandmorty/s01/" href="/rickandmorty/s01/e01") Season 1
+    a.season(id="/rickandmorty/s02/" href="/rickandmorty/s02/e01") Season 2
+    a.season(id="/rickandmorty/s03/" href="/rickandmorty/s03/e01") Season 3
+script(src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.1.min.js")
+script.
+  var id;
+  var entityMap = {
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#39;',
+  '/': "\\/",
+  '`': '&#x60;',
+  '=': '&#x3D;'
+  };
+
+  function escapeHtml (string) {
+    return String(string).replace(/[&<>"'`=\/]/g, function (s) {
+      return entityMap[s];
+    });
+  }
+
+  function slideDown(button) {
+     //- Slide down the season containing the current episode 
+     //- and slide everything else up
+    if ($(button).next().css("display") == "none") {
+      $(button).nextAll("#show").next("#seasons").slideUp();
+      $(button).prevAll("#show").next("#seasons").slideUp();
+      $(button).next().slideDown();
+    } else {
+        $(button).next().slideUp();
+    };
+  }
+
+  $(document).ready(function(){
+    var color;
+    var bg;
+    var hover;
+
+    id = document.location.pathname;
+    id = ("#" + id);
+    id = id.substring(0, id.length - 4);
+    id = escapeHtml(id);
+
+    if (id.indexOf("rickandmorty") > 0) {
+      color = '#f0e14a';
+      bg = '#97ce4c';
+      hover = 'RnMHover';
+    } else if (id.indexOf("gameofthrones") > 0) {
+      color = '#505153';
+      bg = '#8b8b8b';
+      hover = 'GoTHover';
+    } else {
+      color = '#FFC72D';
+      bg = '#006BB6';
+      hover = 'dubsHover';
+    }
+    $("#left-bar").children("#show").addClass(hover);
+    $("#left-bar").children("#seasons").children("a").addClass(hover);
+    $(id).removeClass(hover);
+    $("#left-bar").css('background-color', bg);
+    $(id).css('color', color);
+    $(id).parent().prev("#show").css('color', color);
+    $(id).parent().css('display', 'block');
+    $(id).css('cursor', 'default');
+    $(id).bind('click', function(e){
+        e.preventDefault();
+    });
+  });
