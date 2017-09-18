@@ -5,15 +5,15 @@
 @import '../partials/select-bar.scss';
 
 #timeTilSeason {
-	font-size: 1.5em;
-	margin: 0 0 0.1em 0;
-	padding: 0 0 0 17em;
+    font-size: 1.5em;
+    text-align: center;
+    margin: 0 10em 0 0;
 }
 
 #liveStreamStatus {
-	font-size: 1em;
-	margin: 0 0 0.1em 0;
-	padding: 0 0 0 30em;
+    font-size: 1em;
+    margin: 0 15em 0 0;
+    text-align: center;
 }
 
 #liveStreamStatus em {
@@ -25,27 +25,32 @@
 	text-align: center;
 	display: inline-block;
 	width: 100%;
-	height: 35em;
+	min-height: 30em;
+
 }
 
 #chat {
 	margin: 0 2px 0 1em;
-	height: 35em;
+	height: 30em;
 	width: 13em;
 	display: inline-block;
 }
 
 #bigStreamContainer {
-	margin: -0.3em 0 0 0;
-	min-width: 95em;
-	width: 100%;
-	height: 100%;
-	overflow: hidden;
-	display: inline-block;
+    margin: -0.3em 0 0 0;
+    min-width: 81em;
+    overflow: hidden;
+    display: inline-block;
 }
 
 #streamContainer {
-	display: inline-block;
-	margin: 0 0 0 2em;
-	width: 60%;
+    margin: 0 0 0 2em;
+    width: 50em;
+    display: inline-block;
+    text-align: center;
+    vertical-align: top;
+}
+
+#streamPlayer::-webkit-media-controls {
+  display:none !important;
 }

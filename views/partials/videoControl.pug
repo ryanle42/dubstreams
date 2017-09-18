@@ -32,7 +32,7 @@ script.
 					}
 				}				
 			}
-			if ($(document.body).width() >= $(document).width()) {
+			if (isFullScreen()) {
 				if (event.keyCode == 39) {
 					videoPlayer.currentTime += 3
 				}
@@ -107,6 +107,11 @@ script.
 			color = '#FFC72D';
 			bg = '#006BB6'
 		}
+
+		$("#videoPlayer").bind("contextmenu",function(){
+			return false;
+		});
+
 		$('#select-bar').css('background-color', bg);
 		$('#select-bar').css('color', color);
 		$('#select-bar option[value="' + window.location.pathname + '"]').prop('selected', true);
