@@ -1,0 +1,59 @@
+button {
+	border: none;
+	cursor:pointer;
+	background: none;
+}
+
+#left-bar {
+	@extend .noselect;
+	margin: 3em 0 1em 1.4em;
+	border-radius: 6px;
+	float: left;
+	min-height: 23.5em;
+	height: 30em;
+	border: 1px solid black;
+}
+
+#show {
+	@extend .noselect;
+	font-size: 1.3em;
+	font-weight: 400;
+	margin: 1em 0 0 0.15em;
+	border-width: 100%;
+	text-align: left;
+	width: 190px;
+	border-radius: 6px;
+	outline:none;
+	color: #ffffff;
+}
+
+#seasons {
+	@extend .noselect;	
+	margin: 0 0 0 0.5em;
+	position: relative;
+	display: none;
+	padding: 0 0 1px 0;
+}
+
+.season {
+	@extend .noselect;
+	display: block;
+	font-size: 1.5em;
+	margin: 0 3.5em 0 0.5em;
+	color: #ffffff;
+	outline: none;
+	border-radius: 3px;
+}
+
+.GoTHover:hover {
+	background-color: #9f9f9f;
+}
+
+.RnMHover:hover {
+	background-color: #abd76f;
+}
+
+.dubsHover:hover {
+	background-color: #0082dd;
+}
+

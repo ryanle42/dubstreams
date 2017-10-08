@@ -1,0 +1,19 @@
+doctype html
+html(lang="en")
+	head
+		title Dubstreams
+		link(rel="icon" href="/public/favicon.ico")
+		link(rel="icon" href="/public/favicon.ico")
+		link(rel='stylesheet' href='/css/watchVideo.css')
+	body(background='/rickandmorty/RnMbg.jpg')
+		include /partials/header
+		div#bigContainer
+			include /partials/left-bar
+			div#videoContainer
+				include /partials/select-bar-RnMS01
+				div.videoNavi(display='inline-block')
+					a(href="../e02" class="videoNavi--next")
+						i(class="fa fa-arrow-right fa-2x fa-1x" aria-hidden="true")
+				video#videoPlayer
+					source(src="RnMS01E01.mkv")
+		include /partials/videoControl

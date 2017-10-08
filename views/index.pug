@@ -1,0 +1,269 @@
+doctype html
+html(lang="en")
+	head
+		title Dubstreams
+		link(rel="icon" href="/public/favicon.ico")
+		link(rel='stylesheet' href='/css/index.css')
+		link(href="/scripts/video.js/dist/video-js.css" rel="stylesheet")
+		script(src="/scripts/video.js//dist/video.js")
+		script(src="/scripts/videojs-flash/dist/videojs-flash.min.js")
+	body
+		include /partials/header
+		center#bigStreamContainer.bigStreamContainer
+			include /partials/left-bar
+			p#timeTilSeason.noselect
+			br 
+			p#liveStreamStatus.noselect Livestream is #[em offline]
+			div#streamContainer.streamContainer
+				video(id='streamPlayer' class='video-js' autoPlay controls preload='none' data-setup='{"techorder" : ["flash"] }')
+			div#chat.chat
+				script(id="cid0020000165930761874" data-cfasync="false" async src="//st.chatango.com/js/gz/emb.js" style="width: 100%;height: 100%;") {"handle":"dubstreams","arch":"js","styles":{"a":"006BB6","b":100,"c":"FFFFFF","d":"FFFFFF","k":"006BB6","l":"006BB6","m":"006BB6","n":"FFFFFF","p":"10","q":"006BB6","r":100,"t":0,"fwtickm":1, "showhdr":0,"showx":0}}
+		script.
+			$(document).ready(function(){
+				var isLiveStream = null;
+				var isMoviePlaying = false;
+				var moviePlayInterval;
+				var currentMovie = null;
+				var isTheaterMode = false;
+				var movieTime = 0;
+
+				var videojsInstance = videojs('streamPlayer');
+
+				var videoJsButtonClass = videojs.getComponent('Button');
+				var concreteButtonClass = videojs.extend(videoJsButtonClass, {
+					constructor: function() {
+						videoJsButtonClass.call(this, videojsInstance);
+					}, 
+	
+					handleClick: function(){
+					 	if (isTheaterMode == true) {
+							exitTheaterMode();
+							isTheaterMode = false;
+						} else {
+							enterTheaterMode();
+							isTheaterMode = true;
+						}
+					}
+				});
+				videojsInstance.on('play', function() {
+					if (isMoviePlaying) {
+						videojsInstance.currentTime(movieTime);
+					}
+				})
+
+				var fullScreenToggle = videojsInstance.controlBar.getChild('FullscreenToggle');
+				videojsInstance.controlBar.removeChild(fullScreenToggle);
+				var concreteButtonInstance = videojsInstance.controlBar.addChild(new concreteButtonClass());
+				concreteButtonInstance.addClass("vjs-" + 'theater');
+				videojsInstance.controlBar.addChild(fullScreenToggle)
+				var getLiveStreamStatus = function(callback) {
+					$.post("isLiveStreamOn", function(data) {
+						if (data == 'true' && (isLiveStream == false || isLiveStream == null)) {
+							videojsInstance.src('rtmp://65.19.132.201:1935/live/dubnation');
+							clearInterval(moviePlayInterval);
+							streamOnline(null);
+							isMoviePlaying = false;
+							isLiveStream = true;
+						} else if (data == 'false' && (isLiveStream == true || isLiveStream == null)) {
+							videojsInstance.src("");
+							videojsInstance.reset();
+							streamOffline();
+							isLiveStream = false;
+						} 
+						if (data == 'false') {
+							getMovie();
+						}
+					});
+					if (callback) {
+						callback();	
+					}
+				}
+
+				getLiveStreamStatus(function() {
+					var interval = setInterval(getLiveStreamStatus, 2500);
+				});
+
+				function showRemaining() {
+					let end = new Date('10/17/2017');
+					let _hour = 1000 * 60 * 60;
+					let _day = _hour * 24;
+					let now = new Date();
+						var distance = end - now;
+						if (distance < 0) {
+							document.getElementById('timeTilSeason').innerHTML = null;
+							return;
+						}
+						var days = Math.floor(distance / _day);
+			
+					document.getElementById('timeTilSeason').innerHTML = "NBA Season starts in " + days + " days";
+				}
+
+				showRemaining();
+
+				//- timer = setInterval(showRemaining, 1000);
+				function streamOnline(streamName) {
+					if (streamName) {
+						$("#liveStreamStatus").html("<em>Now Playing</em> " + streamName);
+					} else 	{
+						$("#liveStreamStatus").html("<em>Now Streaming</em>");
+					}
+					$("em").css("color", "green");
+					$("em").css("font-style", "normal");
+				}
+				function streamOffline() {
+					$("#liveStreamStatus").html("Livestream is <em>offline</em");
+					$("em").css("color", "red");
+					$("em").css("font-style", "normal");
+				}
+				function getStartDate(secondsEpoch) {
+					var date = new Date(secondsEpoch*1000);
+					var now = new Date();
+					var hours = date.getHours();
+					var minutes = date.getMinutes();
+					var ampm = hours >= 12 ? 'pm' : 'am';
+					var when;
+					date.getDate() - now.getDate() > 0 ? when = "tomorrow " : when = "";
+
+					hours = hours % 12;
+					hours = hours ? hours : 12;
+					minutes = minutes < 10 ? '0' + minutes : minutes;
+					var strTime = when + "at " + hours + ':' + minutes + ' ' + ampm;
+					return strTime;
+				}
+
+				var playMovie = function(movieStart, movieLength, movieName, fileType) {
+					var videoPlayer = document.getElementById("streamPlayer_html5_api");
+
+					if (Math.floor((new Date).getTime()/1000) - movieStart < 0) {
+						$('#timeTilSeason').html("Next Showing: " + movieName + " " + getStartDate(movieStart));
+					}
+					moviePlayInterval = setInterval(function(){
+						movieTime = Math.floor((new Date).getTime()/1000) - movieStart;
+						if ((movieTime >= 0) && (movieTime < movieLength)) {
+							if (isMoviePlaying == false) {
+								streamOnline(movieName);
+								showRemaining();
+								isMoviePlaying = true;
+								videojsInstance.src("/movies/" + movieName.replace(/\s+/g, '') + fileType);
+								videojsInstance.currentTime(movieTime);
+							}
+						} else if (movieTime > movieLength || isMoviePlaying == true) {
+							videojsInstance.src("");
+							videojsInstance.reset();
+							streamOffline();
+							isMoviePlaying = false;
+							clearInterval(moviePlayInterval);
+							getMovie();
+						}
+					}, 1000);
+				}
+				function getMovie() {
+					$.post("getNextMovie", {name: 'hello', start:'there'}, function(data) {
+						if (data != 'null') {
+							data = JSON.parse(data);
+							if (currentMovie == null) {
+								currentMovie = data;
+								playMovie(data['start'], data['length'], data['name'], data['fileType']);
+							}
+							if (currentMovie != data) {
+								clearInterval(moviePlayInterval);
+								playMovie(data['start'], data['length'], data['name'], data['fileType']);
+							}
+						} else if (isMoviePlaying == true) {
+							isMoviePlaying = false;
+							clearInterval(moviePlayInterval);
+							videojsInstance.src("");
+							videojsInstance.reset();
+							streamOffline();
+						}
+					});
+				}
+				var videoPlayer = document.getElementById("streamPlayer_html5_api");
+
+				function enterTheaterMode() {
+					$('#streamContainer').attr('class', 'streamContainer-theater');
+					$('#chat').attr('class', 'chat-theater');
+					$('#bigStreamContainer').attr('class', 'bigStreamContainer-theater');
+					$('#gpuStreamPlayer').attr('class', 'streamPlayer-theater');
+					$('#streamPlayer').css('height', '100%');
+					$('#chat').children().remove();
+					$('#chat').append(document.createElement("script"));				
+					$('#chat').children('script').attr('id', 'cid0020000165930761874');
+					$('#chat').children('script').attr('async');
+					$('#chat').children('script').attr('data-cfasync', 'false');
+					$('#chat').children('script').attr('style', 'width: 100%; height: 100%;');
+					$('#chat').children('script').attr('src', '//st.chatango.com/js/gz/emb.js');
+					$('#chat').children('script').html('{"handle":"dubstreams","arch":"js","styles":{"a":"000000","b":100,"c":"FFFFFF","d":"FFFFFF","k":"000000","l":"000000","m":"000000","n":"FFFFFF","p":"10","q":"000000","r":100,"t":0,"fwtickm":1, "showhdr":0,"showx":0}}');
+				};
+
+				function exitTheaterMode() {
+					$('#streamContainer').attr('class', 'streamContainer');
+					$('#chat').attr('class', 'chat');
+					$('#bigStreamContainer').attr('class', 'bigStreamContainer');
+					$('#streamPlayer').css('height', '');
+					$('#chat').children().remove();
+					$('#chat').append(document.createElement("script"));							
+					$('#chat').children('script').attr('id', 'cid0020000165930761874');
+					$('#chat').children('script').attr('async');
+					$('#chat').children('script').attr('data-cfasync', 'false');
+					$('#chat').children('script').attr('style', 'width: 100%; height: 100%;');
+					$('#chat').children('script').attr('src', '//st.chatango.com/js/gz/emb.js');
+					$('#chat').children('script').html('{"handle":"dubstreams","arch":"js","styles":{"a":"006BB6","b":100,"c":"FFFFFF","d":"FFFFFF","k":"006BB6","l":"006BB6","m":"006BB6","n":"FFFFFF","p":"10","q":"006BB6","r":100,"t":0,"fwtickm":1, "showhdr":0,"showx":0}}');
+				}
+
+				function isFullScreen() {
+					if (document.fullScreen || 
+						document.mozFullScreen || 
+						document.webkitIsFullScreen) {
+						return true;
+						} else {
+						return false;
+						}		
+				}
+
+				function fullScreen() {
+					if (videoPlayer.requestFullscreen) {
+					  videoPlayer.requestFullscreen();
+					} else if (videoPlayer.mozRequestFullScreen) {
+					  videoPlayer.mozRequestFullScreen();
+					} else if (videoPlayer.webkitRequestFullscreen) {
+					  videoPlayer.webkitRequestFullscreen();
+					}		
+				}
+				function exitFullScreen() {
+					if (document.exitFullscreen) {
+						document.exitFullscreen();
+					} else if (document.webkitExitFullscreen) {
+						document.webkitExitFullscreen();
+					} else if (document.mozCancelFullScreen) {
+						document.mozCancelFullScreen();
+					} else if (document.msExitFullscreen) {
+						document.msExitFullscreen();
+					}
+				};
+				function getVideoLength(hours, minutes, seconds) {
+					return ((hours * 3600) + (minutes * 60) + seconds);
+				};
+
+				function convertDate(month, day, hour, minute) {
+					var date = new Date(2017, month - 1, day, hour, minute, 0);
+					var utcDate = new Date(date.toUTCString());
+					return (Math.floor(utcDate.getTime()/1000));
+				};
+
+				$(document).keydown(function(event) {
+					if (event.keyCode == 38) {
+						if (videoPlayer.volume + 0.1 <= 1) {
+							videoPlayer.volume += 0.1;	
+						}
+					}
+					if (event.keyCode == 40) {
+						if (videoPlayer.volume - 0.1 >= 0) {
+							videoPlayer.volume -= 0.1;
+						}
+					}
+				});
+				$("#streamPlayer").bind("contextmenu",function(){
+					return false;
+				});
+			});

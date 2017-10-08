@@ -1,0 +1,18 @@
+doctype html
+html(lang="en")
+	head
+		title Dubstreams
+		link(rel="icon" href="/public/favicon.ico")
+		link(rel='stylesheet' href='/css/watchVideo.css')
+	body(background='/gameofthrones/GoTbg.jpg')
+		include /partials/header
+		div#bigContainer
+			include /partials/left-bar
+			div#videoContainer
+				include /partials/select-bar-GoTS03
+				div.videoNavi
+					a(href="../e09" class="videoNavi--prev")
+						i(class="fa fa-arrow-left fa-2x" aria-hidden="true")
+				video#videoPlayer
+					source(src="GoTS03E10.mkv")
+		include /partials/videoControl
